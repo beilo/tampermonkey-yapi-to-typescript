@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { UserPreferences } from '../utils/userPreferences';
 import { ApiData } from '../utils/instructionGenerator';
 import { generateAgentInstruction } from '../utils/instructionGenerator';
+import { convertYapiResponseToTypeScript } from '../utils/jsonToTsConverter';
+import { showNotification } from '../utils/notifications';
 
 interface ModalProps {
   instruction: string;
@@ -11,7 +13,27 @@ interface ModalProps {
 }
 
 const YapiModal: React.FC<ModalProps> = ({ instruction, apiData, onClose, onCopy }) => {
-  const [activeTab, setActiveTab] = useState<'instruction' | 'preferences'>('instruction');
+  const [activeTab, setActiveTab] = useState<'instruction' | 'preferences' | 'typescript'>('instruction');
+  const [generatedTypes, setGeneratedTypes] = useState<string[]>([]);
+  
+  // 生成TypeScript类型
+  const handleGenerateTs = () => {
+    try {
+      const tsInterfaces = convertYapiResponseToTypeScript(apiData.res_body);
+      setGeneratedTypes(tsInterfaces);
+      setActiveTab('typescript');
+    } catch (error) {
+      console.error('生成TypeScript失败:', error);
+      alert(`生成TypeScript失败: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+  
+  // 复制生成的TypeScript
+  const handleCopyTs = () => {
+    const typeScript = generatedTypes.join('\n\n');
+    navigator.clipboard.writeText(typeScript);
+    showNotification('TypeScript类型已复制到剪贴板！');
+  };
 
   // 创建单选按钮选项
   const RadioOption = ({ 
@@ -88,6 +110,12 @@ const YapiModal: React.FC<ModalProps> = ({ instruction, apiData, onClose, onCopy
           Cursor 指令
         </div>
         <div
+          className={`yapi-helper-tab ${activeTab === 'typescript' ? 'active' : ''}`}
+          onClick={handleGenerateTs}
+        >
+          TypeScript
+        </div>
+        <div
           className={`yapi-helper-tab ${activeTab === 'preferences' ? 'active' : ''}`}
           onClick={() => setActiveTab('preferences')}
         >
@@ -115,6 +143,30 @@ const YapiModal: React.FC<ModalProps> = ({ instruction, apiData, onClose, onCopy
               }}
             >
               {instruction}
+            </pre>
+          </div>
+        )}
+        
+        {/* TypeScript内容 */}
+        {activeTab === 'typescript' && (
+          <div className="yapi-helper-instruction-content">
+            <pre
+              style={{
+                whiteSpace: 'pre-wrap',
+                background: '#f6f8fa',
+                padding: '16px',
+                borderRadius: '4px',
+                overflowX: 'auto',
+                fontSize: '14px',
+                fontFamily:
+                  "SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace",
+                maxHeight: '400px',
+                overflowY: 'auto',
+              }}
+            >
+              {generatedTypes.length > 0 
+                ? generatedTypes.join('\n\n') 
+                : '// 正在生成TypeScript接口...'}
             </pre>
           </div>
         )}
@@ -200,9 +252,18 @@ const YapiModal: React.FC<ModalProps> = ({ instruction, apiData, onClose, onCopy
         <button className="yapi-helper-button secondary" onClick={onClose}>
           关闭
         </button>
-        <button className="yapi-helper-button primary" onClick={onCopy}>
-          复制到剪贴板
-        </button>
+        
+        {activeTab === 'instruction' && (
+          <button className="yapi-helper-button primary" onClick={onCopy}>
+            复制Cursor指令
+          </button>
+        )}
+        
+        {activeTab === 'typescript' && (
+          <button className="yapi-helper-button primary" onClick={handleCopyTs}>
+            复制TypeScript
+          </button>
+        )}
       </div>
     </div>
   );
