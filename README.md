@@ -1,59 +1,98 @@
-# YApi to TypeScript 转换工具
+# YApi to TypeScript via Cursor
 
-这是一个用于将 YApi 接口定义转换为 TypeScript 代码的 Tampermonkey 用户脚本。
+这是一个油猴脚本，用于将 YApi 接口转换为 TypeScript 代码（通过 Cursor Agent）。
 
 ## 功能特点
 
-- 在 YApi 接口详情页面添加「生成 TypeScript 代码」按钮
-- 自动获取当前接口的定义信息
-- 利用 OpenAI API 将接口定义转换为 TypeScript 代码
-- 生成的代码包含：
-  - 请求参数的 TypeScript 接口定义
-  - 返回数据的 TypeScript 接口定义
-  - 基于 axios 的请求函数
-  - 使用示例代码
-- 纯文本格式展示生成结果
-- 提供复制代码功能
+- 在 YApi 接口页面添加「生成 TypeScript 代码」按钮
+- 自动获取接口数据并生成 Cursor Agent 指令
+- 支持自定义类型定义风格、请求库等选项
+- 支持系统通知提醒
 
-## 安装方法
+## 技术栈
 
-1. 确保已安装 Tampermonkey 浏览器扩展
-   - [Chrome 版本](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-   - [Firefox 版本](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/)
-   - [Edge 版本](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd)
+- [Vite](https://vitejs.dev/) - 前端构建工具
+- [vite-plugin-monkey](https://github.com/lisonge/vite-plugin-monkey) - 油猴脚本开发插件
+- [React](https://reactjs.org/) - 用户界面库
+- [TypeScript](https://www.typescriptlang.org/) - 类型安全的 JavaScript 超集
 
-2. 点击 [安装脚本](yapi-to-typescript.user.js) (或者复制脚本内容，在 Tampermonkey 中手动创建)
+## 开发设置
+
+### 前提条件
+
+- Node.js (v14+)
+- npm 或 yarn
+
+### 安装依赖
+
+```bash
+npm install
+# 或
+yarn install
+```
+
+### 开发模式
+
+```bash
+npm run dev
+# 或
+yarn dev
+```
+
+这将启动开发服务器，并生成一个本地油猴脚本用于测试。
+
+### 构建生产版本
+
+```bash
+npm run build
+# 或
+yarn build
+```
+
+构建后的脚本将位于 `dist` 目录中。
+
+## 项目结构
+
+```
+.
+├── src/                    # 源代码
+│   ├── components/         # React 组件
+│   │   ├── YapiButton.tsx  # 主按钮组件
+│   │   └── YapiModal.tsx   # 模态框组件
+│   ├── utils/              # 工具函数
+│   │   ├── userPreferences.ts     # 用户偏好管理
+│   │   ├── notifications.ts       # 通知相关函数
+│   │   └── instructionGenerator.ts # 指令生成器
+│   ├── styles/             # 样式文件
+│   │   └── yapiHelper.css  # YApi助手样式
+│   ├── App.tsx             # 应用入口组件
+│   └── main.tsx            # 应用入口文件
+├── public/                 # 静态资源
+├── vite.config.ts          # Vite 配置
+└── package.json            # 项目依赖与脚本
+```
+
+## 安装脚本
+
+1. 安装 [Tampermonkey](https://www.tampermonkey.net/) 浏览器扩展
+2. 打开构建后的脚本 (dist/*.user.js)
+3. Tampermonkey 应该会自动提示安装，点击「安装」按钮
 
 ## 使用方法
 
-1. 打开任意 YApi 接口详情页面（例如：interface.codemao.cn）
-2. 页面右上角会出现「生成 TypeScript 代码」按钮
-3. 点击按钮后，脚本会自动获取当前接口信息并调用 OpenAI API 生成代码
-4. 生成的代码会以纯文本模态框的形式显示，可以直接复制使用
-
-## API 配置
-
-脚本默认使用以下 OpenAI API 配置：
-```javascript
-{
-    apiKey: 'sk-XE8ttQvteFk9Ijqz282fD78cF77a46AdB94c8355011612A9',
-    baseURL: 'https://www.gptapi.us/v1',
-    model: 'gpt-3.5-turbo'
-}
-```
-
-如需修改配置，请直接编辑脚本中的相应部分。
-
-## 注意事项
-
-- 脚本需要接口页面能够正确加载，并且能够获取到接口 ID
-- 脚本使用 OpenAI API，需要确保 API 密钥有效且能够正常访问
-- 如遇问题，可以查看浏览器控制台输出的日志信息进行排查
-
-## 许可证
-
-MIT
+1. 访问 YApi 接口页面
+2. 点击页面右上角的「生成 TypeScript 代码」按钮
+3. 在弹出的模态框中查看生成的指令并点击「复制到剪贴板」
+4. 粘贴到 Cursor 编辑器中并发送
 
 ## 贡献指南
 
-欢迎提交 Issue 或 Pull Request 来改进这个脚本。 
+1. Fork 本仓库
+2. 创建您的特性分支 (`git checkout -b feature/amazing-feature`)
+3. 提交您的更改 (`git commit -m 'Add some amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 开启一个 Pull Request
+
+## 许可证
+
+本项目采用 MIT 许可证 - 详情见 LICENSE 文件

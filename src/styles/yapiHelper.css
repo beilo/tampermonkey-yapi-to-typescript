@@ -1,0 +1,127 @@
+.yapi-helper-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    padding: 10px 20px;
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.yapi-helper-btn:hover {
+    background-color: #3367d6;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
+
+.yapi-helper-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-width: 800px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: auto;
+    z-index: 10000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.yapi-helper-notification {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    z-index: 10001;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.yapi-helper-notification.show {
+    opacity: 1;
+}
+
+.yapi-helper-button-container {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.yapi-helper-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yapi-helper-button.primary {
+    background-color: #4285f4;
+    color: white;
+}
+
+.yapi-helper-button.secondary {
+    background-color: #f0f0f0;
+}
+
+.yapi-helper-button:hover {
+    filter: brightness(0.95);
+}
+
+.yapi-helper-tabs {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.yapi-helper-tab {
+    padding: 8px 16px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.yapi-helper-tab.active {
+    border-bottom: 2px solid #4285f4;
+    color: #4285f4;
+}
+
+.yapi-helper-section {
+    margin-bottom: 15px;
+}
+
+.yapi-helper-section-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.yapi-helper-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.yapi-helper-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.yapi-helper-instruction-content {
+    max-height: 400px;
+    overflow-y: auto;
+} 
