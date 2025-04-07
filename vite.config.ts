@@ -26,10 +26,7 @@ export default defineConfig({
             'ReactDOM',
             'umd/react-dom.production.min.js',
           ),
-          'json-schema-to-typescript': cdn.jsdelivr(
-            'jstt',
-            'gh/beilo/tampermonkey-yapi-to-typescript@0.2.1/src/utils/bundle.js'
-          ),
+          'json-schema-to-typescript': ['jstt', 'https://cdn.jsdelivr.net/gh/beilo/tampermonkey-yapi-to-typescript@v0.2.1/src/utils/bundle.js'],
         },
       },
     }),
