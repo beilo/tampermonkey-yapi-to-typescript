@@ -1,6 +1,3 @@
-// @ts-ignore
-// 使用动态导入和window全局对象结合的方式处理UMD模块
-import "./bundle.js";
 import { TypeScriptResult } from "../types/yapi";
 
 // 使用类型断言获取全局window上的jstt对象
