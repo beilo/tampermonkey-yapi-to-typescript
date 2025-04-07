@@ -16,7 +16,7 @@
 
 1. 安装 [Tampermonkey](https://www.tampermonkey.net/) 浏览器扩展
 2. 点击下方安装链接：
-   [安装脚本](https://raw.githubusercontent.com/beilo/tampermonkey-yapi-to-typescript/main/yapi-to-typescript.user.js)
+   [安装脚本](https://raw.githubusercontent.com/beilo/tampermonkey-yapi-to-typescript/main/dist/yapi-to-typescript.user.js)
 
 ## 使用方法
 
@@ -38,36 +38,10 @@
 ## 技术栈
 
 - [Vite](https://vitejs.dev/) - 前端构建工具
-- [vite-plugin-monkey](https://github.com/lisonge/vite-plugin-monkey) - 油猴脚本开发插件
+- [vite-plugin-monkey](https://github.com/lisonge/vite-plugin-monkey) - 油猴脚本开发
 - [React](https://reactjs.org/) - 用户界面库
-- [TypeScript](https://www.typescriptlang.org/) - 类型安全的 JavaScript 超集
 
-## 开发设置
 
-### 前提条件
-
-- Node.js (v14+)
-- npm 或 yarn
-
-### 安装依赖
-
-```bash
-npm install
-# 或
-yarn install
-```
-
-### 开发模式
-
-```bash
-npm run dev
-# 或
-yarn dev
-```
-
-这将启动开发服务器，并生成一个本地油猴脚本用于测试。
-
-### 构建生产版本
 
 ```bash
 npm run build
@@ -77,44 +51,10 @@ yarn build
 
 构建后的脚本将位于 `dist` 目录中。
 
-## 项目结构
 
-```
-.
-├── src/                    # 源代码
-│   ├── components/         # React 组件
-│   │   ├── YapiButton.tsx  # 主按钮组件
-│   │   └── YapiModal.tsx   # 模态框组件
-│   ├── utils/              # 工具函数
-│   │   ├── userPreferences.ts     # 用户偏好管理
-│   │   ├── notifications.ts       # 通知相关函数
-│   │   └── instructionGenerator.ts # 指令生成器
-│   ├── styles/             # 样式文件
-│   │   └── yapiHelper.css  # YApi助手样式
-│   ├── App.tsx             # 应用入口组件
-│   └── main.tsx            # 应用入口文件
-├── public/                 # 静态资源
-├── vite.config.ts          # Vite 配置
-└── package.json            # 项目依赖与脚本
-```
 
 ## 更新日志
 
-### v0.2.1 (2023-07-xx)
-- 优化用户界面
-- 添加自动更新支持
-- 修复已知问题
-
-### v0.2 (2023-xx-xx)
-- 初始发布版本
-
-## 贡献指南
-
-1. Fork 本仓库
-2. 创建您的特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交您的更改 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 开启一个 Pull Request
 
 ## 反馈与支持
 
