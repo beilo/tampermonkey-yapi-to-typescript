@@ -1,4 +1,5 @@
 import { UserPreferences, Preferences } from './userPreferences';
+import useUserPreferencesStore from '../store/userPreferencesStore';
 
 export interface ApiData {
   title: string;
@@ -16,8 +17,18 @@ export interface ApiData {
  * @returns 生成的Cursor Agent指令
  */
 export function generateAgentInstruction(data: { data: ApiData }): string {
-  // 获取用户偏好
-  const prefs = UserPreferences.getAll();
+  // 尝试从 store 获取用户偏好，如果无法获取则使用 UserPreferences
+  let prefs: Preferences;
+  
+  try {
+    // 获取 store 实例
+    const prefsStore = useUserPreferencesStore.useStore();
+    // 从 store 获取偏好
+    prefs = prefsStore.getAllPreferences();
+  } catch (e) {
+    // 如果无法获取 store（例如在初始化前调用），则回退到直接获取
+    prefs = UserPreferences.getAll();
+  }
 
   // 提取API数据
   const apiData = data.data;

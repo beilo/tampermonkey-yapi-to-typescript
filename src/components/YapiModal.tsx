@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { UserPreferences } from '../utils/userPreferences';
 import useYapiStore from '../store/yapiStore';
+import useUserPreferencesStore from '../store/userPreferencesStore';
 import useClipboard from '../hooks/useClipboard';
 import { generateAgentInstruction } from '../utils/instructionGenerator';
 
@@ -12,6 +13,8 @@ interface ModalProps {
 const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
   // 使用 yapiStore
   const store = useYapiStore.useStore();
+  // 使用 userPreferencesStore
+  const prefsStore = useUserPreferencesStore.useStore();
   const { copyToClipboard } = useClipboard();
   
   // 每次模态框打开时，如果选择了TypeScript标签但没有生成TypeScript类型，则自动生成
@@ -60,7 +63,7 @@ const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
           checked={checked}
           id={`${name}-${value}`}
           onChange={() => {
-            UserPreferences.save(name as any, value);
+            prefsStore.setPreference(name as any, value);
           }}
         />
         <label htmlFor={`${name}-${value}`}>{label}</label>
@@ -86,7 +89,7 @@ const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
           checked={checked}
           id={`checkbox-${name}`}
           onChange={(e) => {
-            UserPreferences.save(name as any, e.target.checked);
+            prefsStore.setPreference(name as any, e.target.checked);
           }}
         />
         <label htmlFor={`checkbox-${name}`}>{label}</label>
@@ -96,7 +99,7 @@ const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
 
   // 重置所有偏好为默认值
   const handleReset = async () => {
-    UserPreferences.resetAll();
+    prefsStore.resetAllPreferences();
     
     // 使用最新的偏好重新生成指令
     if (store.apiData) {
@@ -196,13 +199,13 @@ const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
                   name="typeStyle"
                   value="interface"
                   label="Interface"
-                  checked={UserPreferences.get('typeStyle') === 'interface'}
+                  checked={prefsStore.typeStyle === 'interface'}
                 />
                 <RadioOption
                   name="typeStyle"
                   value="type"
                   label="Type"
-                  checked={UserPreferences.get('typeStyle') === 'type'}
+                  checked={prefsStore.typeStyle === 'type'}
                 />
               </div>
             </div>
@@ -215,13 +218,13 @@ const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
                   name="requestLib"
                   value="axios"
                   label="Axios"
-                  checked={UserPreferences.get('requestLib') === 'axios'}
+                  checked={prefsStore.requestLib === 'axios'}
                 />
                 <RadioOption
                   name="requestLib"
                   value="fetch"
                   label="Fetch API"
-                  checked={UserPreferences.get('requestLib') === 'fetch'}
+                  checked={prefsStore.requestLib === 'fetch'}
                 />
               </div>
             </div>
@@ -233,22 +236,22 @@ const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
                 <CheckboxOption
                   name="enableComments"
                   label="添加详细注释"
-                  checked={UserPreferences.get('enableComments')}
+                  checked={prefsStore.enableComments}
                 />
                 <CheckboxOption
                   name="includeExamples"
                   label="包含使用示例"
-                  checked={UserPreferences.get('includeExamples')}
+                  checked={prefsStore.includeExamples}
                 />
                 <CheckboxOption
                   name="useOptionalProps"
                   label="使用可选属性标记 (?)"
-                  checked={UserPreferences.get('useOptionalProps')}
+                  checked={prefsStore.useOptionalProps}
                 />
                 <CheckboxOption
                   name="useEnums"
                   label="使用类型字面量+as const代替enum"
-                  checked={UserPreferences.get('useEnums')}
+                  checked={prefsStore.useEnums}
                 />
               </div>
             </div>
