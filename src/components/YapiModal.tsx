@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { UserPreferences } from '../utils/userPreferences';
-import useYapiStore from '../store/yapiStore';
+import useYapiStore from '../store/useYapiStore';
 import useUserPreferencesStore from '../store/userPreferencesStore';
 import useClipboard from '../hooks/useClipboard';
 import { generateAgentInstruction } from '../utils/instructionGenerator';

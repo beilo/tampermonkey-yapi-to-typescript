@@ -1,5 +1,5 @@
 import React from 'react';
-import useYapiStore from '../store/yapiStore';
+import useYapiStore from '../store/useYapiStore';
 import useClipboard from '../hooks/useClipboard';
 import YapiModal from './YapiModal';
 import '../styles/yapiHelper.css';
@@ -8,10 +8,9 @@ import '../styles/yapiHelper.css';
  * YapiButton 组件 - 提供生成 TypeScript 代码功能
  */
 const YapiButton: React.FC = () => {
-  // 使用 yapiStore
-  const yapiStore = useYapiStore;
-  const store = yapiStore.useStore();
-  const loading = yapiStore.useLoading();
+  // 使用 yapiStore 
+  const store = useYapiStore.useStore();
+  const loading = useYapiStore.useLoading();
   
   // 使用剪贴板 Hook
   const { copyToClipboard } = useClipboard();
