@@ -1,11 +1,15 @@
 // @ts-ignore
 // 使用动态导入和window全局对象结合的方式处理UMD模块
 import "./bundle.js";
+import { TypeScriptResult } from "../types/yapi";
 
 // 使用类型断言获取全局window上的jstt对象
 const jstt = (window as any).jstt;
 
-var options = {
+/**
+ * JSON转TypeScript的编译选项
+ */
+const compileOptions = {
   bannerComment: "",
   declareExternallyReferenced: true,
   enablevarEnums: true,
@@ -15,98 +19,113 @@ var options = {
   unknownAny: false,
 };
 
-// 格式化 JSON
+/**
+ * 格式化JSON，设置additionalProperties为false
+ * @param objectJson JSON字符串
+ * @returns 格式化后的对象
+ */
 function formatJson(objectJson: string) {
-  var cloneObject = JSON.parse(objectJson);
+  const cloneObject = JSON.parse(objectJson);
+  
+  // 顶层属性设置
   if (cloneObject.properties) {
     cloneObject.additionalProperties = false;
   }
-  function loop(looper: any) {
-    for (var key in looper) {
-      if (looper[key].properties) {
-        looper[key].additionalProperties = false;
+  
+  // 递归设置子属性
+  function processNestedProperties(obj: any) {
+    for (const key in obj) {
+      if (obj[key]?.properties) {
+        obj[key].additionalProperties = false;
       }
-      if (typeof looper[key] === "object") {
-        loop(looper[key]);
+      
+      if (typeof obj[key] === "object" && obj[key] !== null) {
+        processNestedProperties(obj[key]);
       }
     }
   }
-  loop(cloneObject);
+  
+  processNestedProperties(cloneObject);
   return cloneObject;
 }
 
-// 提取path转成大驼峰
-function getFormattedString(str: string) {
-  if (!str) {
+/**
+ * 从API路径生成类型名称（大驼峰格式）
+ * @param path API路径
+ * @returns 格式化后的类型名称
+ */
+function getTypeNameFromPath(path: string): string {
+  if (!path) {
     return "";
   }
 
-  var words = str.split("/").filter(Boolean);
-
-  if (words.length === 0 || words[0] === "") {
+  const words = path.split("/").filter(Boolean);
+  if (words.length === 0) {
     return "";
   }
 
-  var output = "I";
-  for (var i = 0; i < words.length; i++) {
-    output += words[i].charAt(0).toUpperCase() + words[i].slice(1);
+  // 以I开头，后面是大驼峰格式
+  let typeName = "I";
+  for (const word of words) {
+    typeName += word.charAt(0).toUpperCase() + word.slice(1);
   }
 
-  return output;
+  return typeName;
 }
 
-export async function convertYapiRequestToTypeScript(
-  json: string,
-  name: string
-) {
+/**
+ * 将JSON转换为TypeScript类型定义
+ * @param json JSON字符串
+ * @param name 类型名称
+ * @returns 生成的TypeScript类型定义
+ */
+export async function convertJsonToTypeScript(json: string, name: string): Promise<string> {
   try {
     const formattedJson = formatJson(json);
-    const result = await jstt.compile(formattedJson, name, options);
+    const result = await jstt.compile(formattedJson, name, compileOptions);
     return result;
   } catch (error) {
-    console.log("📢 convertYapiRequestToTypeScript", error);
+    console.error("📢 convertJsonToTypeScript error:", error);
     return "";
   }
 }
 
-export async function convertYapiResponseToTypeScript(
-  json: string,
-  name: string
-) {
+/**
+ * 处理YApi数据，生成TypeScript类型定义
+ * @param data YApi接口数据
+ * @returns 生成的TypeScript类型定义结果
+ */
+export async function handleData(data: any): Promise<TypeScriptResult> {
   try {
-    const formattedJson = formatJson(json);
-    const result = await jstt.compile(formattedJson, name, options);
-    return result;
+    const name = getTypeNameFromPath(data.query_path?.path || data.path);
+    
+    // 处理请求参数
+    const query = data.req_query || [];
+    const reqBodyOther = data.req_body_other || "{}";
+    const params = JSON.parse(reqBodyOther);
+
+    // 处理响应数据
+    const resBody = JSON.parse(data.res_body || "{}");
+    const response = (resBody.properties && resBody.properties.data) || resBody;
+
+    // 生成TypeScript类型
+    const [queryType, paramsType, responseType] = await Promise.all([
+      convertJsonToTypeScript(JSON.stringify(query), `${name}Query`),
+      convertJsonToTypeScript(JSON.stringify(params), `${name}Params`),
+      convertJsonToTypeScript(JSON.stringify(response), `${name}Response`)
+    ]);
+
+    return {
+      queryType,
+      paramsType,
+      responseType,
+    };
   } catch (error) {
-    console.log("📢 convertYapiResponseToTypeScript", error);
-    return "";
+    console.error("📢 handleData error:", error);
+    throw new Error(`生成TypeScript类型失败: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
-export async function handleData(data: any) {
-  const name = getFormattedString(data.path);
-  const query = data.req_query;
-  const params = JSON.parse(data.req_body_other);
-
-  const resBody = JSON.parse(data.res_body);
-  const response = (resBody.properties && resBody.properties.data) || resBody;
-
-  const queryType = await convertYapiRequestToTypeScript(
-    JSON.stringify(query),
-    `${name}Query`
-  );
-  const paramsType = await convertYapiRequestToTypeScript(
-    JSON.stringify(params),
-    `${name}Params`
-  );
-  const responseType = await convertYapiResponseToTypeScript(
-    JSON.stringify(response),
-    `${name}Response`
-  );
-
-  return {
-    queryType,
-    paramsType,
-    responseType,
-  };
-}
+// 保留向后兼容性
+export const convertYapiRequestToTypeScript = convertJsonToTypeScript;
+export const convertYapiResponseToTypeScript = convertJsonToTypeScript;

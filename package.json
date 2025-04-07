@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@helux/store-pinia": "^1.0.10",
     "json-schema-to-typescript": "^15.0.4",
     "json-to-ts": "^2.1.0",
     "react": "^18.3.1",

@@ -1,63 +1,44 @@
-import React, { useState } from 'react';
-import { generateAgentInstruction } from '../utils/instructionGenerator';
-import { showNotification, sendSystemNotification } from '../utils/notifications';
+import React from 'react';
+import useYapiStore from '../store/yapiStore';
+import useClipboard from '../hooks/useClipboard';
 import YapiModal from './YapiModal';
 import '../styles/yapiHelper.css';
 
-interface YapiData {
-  data: {
-    title: string;
-    method: string;
-    query_path: {
-      path: string;
-    };
-    req_body_other?: string;
-    res_body?: string;
-  };
-}
-
+/**
+ * YapiButton 组件 - 提供生成 TypeScript 代码功能
+ */
 const YapiButton: React.FC = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [instruction, setInstruction] = useState('');
-  const [apiData, setApiData] = useState<YapiData | null>(null);
+  // 使用 yapiStore
+  const yapiStore = useYapiStore;
+  const store = yapiStore.useStore();
+  const loading = yapiStore.useLoading();
+  
+  // 使用剪贴板 Hook
+  const { copyToClipboard } = useClipboard();
 
+  /**
+   * 处理按钮点击事件
+   */
   const handleClick = async () => {
     try {
-      // 1. 从 URL 获取接口 ID
-      const apiId = window.location.pathname.split('/').pop();
-      if (!apiId) throw new Error('无法获取接口ID');
-
-      // 2. 调用 YApi 接口获取数据
-      const response = await fetch(`/api/interface/get?id=${apiId}`);
-      const data = await response.json();
-
-      // 3. 生成 Cursor Agent 指令
-      const generatedInstruction = generateAgentInstruction(data);
-
-      // 4. 设置状态并显示模态框
-      setInstruction(generatedInstruction);
-      setApiData(data);
-      setShowModal(true);
+      // 生成 Agent 指令并显示模态框
+      await store.generateInstruction();
     } catch (error) {
+      // 错误处理在 store 中已完成
       console.error('YApi Helper: 生成指令失败:', error);
-      alert(`生成指令失败: ${(error as Error).message || '请查看控制台了解详情'}`);
     }
   };
 
+  /**
+   * 处理复制功能
+   */
   const handleCopy = () => {
-    navigator.clipboard.writeText(instruction);
-    
-    // 显示通知
-    showNotification('指令已复制到剪贴板！请切换到 Cursor 编辑器并粘贴。');
-    
-    // 关闭模态框
-    setShowModal(false);
-    
-    // 发送系统通知
-    sendSystemNotification(
-      'YApi to TypeScript', 
-      'YApi 指令已复制，请切换到 Cursor 编辑器并粘贴'
-    );
+    // 复制到剪贴板
+    copyToClipboard(store.instruction, {
+      successMessage: '指令已复制到剪贴板！请切换到 Cursor 编辑器并粘贴。',
+      notificationTitle: 'YApi to TypeScript',
+      onSuccess: () => store.setModalVisibility(false)
+    });
   };
 
   return (
@@ -66,15 +47,17 @@ const YapiButton: React.FC = () => {
         className="yapi-helper-btn" 
         onClick={handleClick}
         data-yapi-helper="true"
+        disabled={loading.fetchApiData.loading || loading.generateInstruction.loading}
       >
-        生成 TypeScript 代码
+        {loading.fetchApiData.loading || loading.generateInstruction.loading 
+          ? '加载中...' 
+          : '生成 TypeScript 代码'
+        }
       </button>
       
-      {showModal && apiData && (
+      {store.isModalVisible && store.apiData && (
         <YapiModal
-          instruction={instruction}
-          apiData={apiData.data}
-          onClose={() => setShowModal(false)}
+          onClose={() => store.setModalVisibility(false)}
           onCopy={handleCopy}
         />
       )}

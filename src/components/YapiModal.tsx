@@ -1,38 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { UserPreferences } from '../utils/userPreferences';
-import { ApiData } from '../utils/instructionGenerator';
+import useYapiStore from '../store/yapiStore';
+import useClipboard from '../hooks/useClipboard';
 import { generateAgentInstruction } from '../utils/instructionGenerator';
-import { convertYapiResponseToTypeScript } from '../utils/jsonToTsConverter';
-import { showNotification } from '../utils/notifications';
 
 interface ModalProps {
-  instruction: string;
-  apiData: ApiData;
   onClose: () => void;
   onCopy: () => void;
 }
 
-const YapiModal: React.FC<ModalProps> = ({ instruction, apiData, onClose, onCopy }) => {
-  const [activeTab, setActiveTab] = useState<'instruction' | 'preferences' | 'typescript'>('instruction');
-  const [generatedTypes, setGeneratedTypes] = useState<string[]>([]);
+const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
+  // 使用 yapiStore
+  const store = useYapiStore.useStore();
+  const { copyToClipboard } = useClipboard();
+  
+  // 每次模态框打开时，如果选择了TypeScript标签但没有生成TypeScript类型，则自动生成
+  useEffect(() => {
+    if (store.activeTab === 'typescript' && !store.typescriptResult) {
+      handleGenerateTs();
+    }
+  }, [store.activeTab]);
   
   // 生成TypeScript类型
-  const handleGenerateTs = () => {
+  const handleGenerateTs = async () => {
     try {
-      const tsInterfaces = convertYapiResponseToTypeScript(apiData.res_body);
-      setGeneratedTypes(tsInterfaces);
-      setActiveTab('typescript');
+      await store.generateTypeScript();
     } catch (error) {
       console.error('生成TypeScript失败:', error);
-      alert(`生成TypeScript失败: ${error instanceof Error ? error.message : String(error)}`);
     }
   };
   
   // 复制生成的TypeScript
   const handleCopyTs = () => {
-    const typeScript = generatedTypes.join('\n\n');
-    navigator.clipboard.writeText(typeScript);
-    showNotification('TypeScript类型已复制到剪贴板！');
+    if (store.mergedTypeScript) {
+      copyToClipboard(store.mergedTypeScript, {
+        successMessage: 'TypeScript类型已复制到剪贴板！'
+      });
+    }
   };
 
   // 创建单选按钮选项
@@ -91,12 +95,19 @@ const YapiModal: React.FC<ModalProps> = ({ instruction, apiData, onClose, onCopy
   };
 
   // 重置所有偏好为默认值
-  const handleReset = () => {
+  const handleReset = async () => {
     UserPreferences.resetAll();
+    
     // 使用最新的偏好重新生成指令
-    const freshInstruction = generateAgentInstruction({ data: apiData });
-    // 这里应该刷新modal，但由于state不会立即更新，可能需要其他方式实现
-    window.location.reload(); // 简单的解决方案：刷新页面
+    if (store.apiData) {
+      const freshInstruction = generateAgentInstruction({ data: store.apiData });
+      
+      // 更新 store 中的指令而不是刷新页面
+      store.instruction = freshInstruction;
+      
+      // 强制更新视图
+      store.setActiveTab(store.activeTab);
+    }
   };
 
   return (
@@ -104,20 +115,23 @@ const YapiModal: React.FC<ModalProps> = ({ instruction, apiData, onClose, onCopy
       {/* 标签页 */}
       <div className="yapi-helper-tabs">
         <div
-          className={`yapi-helper-tab ${activeTab === 'instruction' ? 'active' : ''}`}
-          onClick={() => setActiveTab('instruction')}
+          className={`yapi-helper-tab ${store.activeTab === 'instruction' ? 'active' : ''}`}
+          onClick={() => store.setActiveTab('instruction')}
         >
           Cursor 指令
         </div>
         <div
-          className={`yapi-helper-tab ${activeTab === 'typescript' ? 'active' : ''}`}
-          onClick={handleGenerateTs}
+          className={`yapi-helper-tab ${store.activeTab === 'typescript' ? 'active' : ''}`}
+          onClick={() => {
+            handleGenerateTs();
+            store.setActiveTab('typescript');
+          }}
         >
           TypeScript
         </div>
         <div
-          className={`yapi-helper-tab ${activeTab === 'preferences' ? 'active' : ''}`}
-          onClick={() => setActiveTab('preferences')}
+          className={`yapi-helper-tab ${store.activeTab === 'preferences' ? 'active' : ''}`}
+          onClick={() => store.setActiveTab('preferences')}
         >
           偏好设置
         </div>
@@ -126,7 +140,7 @@ const YapiModal: React.FC<ModalProps> = ({ instruction, apiData, onClose, onCopy
       {/* 内容区域 */}
       <div>
         {/* 指令内容 */}
-        {activeTab === 'instruction' && (
+        {store.activeTab === 'instruction' && (
           <div className="yapi-helper-instruction-content">
             <pre
               style={{
@@ -142,13 +156,13 @@ const YapiModal: React.FC<ModalProps> = ({ instruction, apiData, onClose, onCopy
                 overflowY: 'auto',
               }}
             >
-              {instruction}
+              {store.instruction}
             </pre>
           </div>
         )}
         
         {/* TypeScript内容 */}
-        {activeTab === 'typescript' && (
+        {store.activeTab === 'typescript' && (
           <div className="yapi-helper-instruction-content">
             <pre
               style={{
@@ -164,15 +178,15 @@ const YapiModal: React.FC<ModalProps> = ({ instruction, apiData, onClose, onCopy
                 overflowY: 'auto',
               }}
             >
-              {generatedTypes.length > 0 
-                ? generatedTypes.join('\n\n') 
+              {store.typescriptResult 
+                ? store.mergedTypeScript 
                 : '// 正在生成TypeScript接口...'}
             </pre>
           </div>
         )}
 
         {/* 偏好设置内容 */}
-        {activeTab === 'preferences' && (
+        {store.activeTab === 'preferences' && (
           <div>
             {/* 类型定义风格 */}
             <div className="yapi-helper-section">
@@ -253,13 +267,13 @@ const YapiModal: React.FC<ModalProps> = ({ instruction, apiData, onClose, onCopy
           关闭
         </button>
         
-        {activeTab === 'instruction' && (
+        {store.activeTab === 'instruction' && (
           <button className="yapi-helper-button primary" onClick={onCopy}>
             复制Cursor指令
           </button>
         )}
         
-        {activeTab === 'typescript' && (
+        {store.activeTab === 'typescript' && (
           <button className="yapi-helper-button primary" onClick={handleCopyTs}>
             复制TypeScript
           </button>

@@ -1,68 +1,50 @@
 import React from "react";
+import useYapiStore from "../store/yapiStore";
+import useClipboard from "../hooks/useClipboard";
 import "../styles/yapiHelper.css";
-import {
-  handleData
-} from "../utils/jsonToTsConverter";
-import {
-  sendSystemNotification,
-  showNotification,
-} from "../utils/notifications";
 
-interface YapiData {
-  data: {
-    title: string;
-    method: string;
-    query_path: {
-      path: string;
-    };
-    req_body_other?: string;
-    res_body?: string;
-  };
-}
-
+/**
+ * JsonToTsButton 组件 - 提供一键转换 JSON 到 TypeScript 的功能
+ */
 const JsonToTsButton: React.FC = () => {
+  // 使用 yapiStore
+  const yapiStore = useYapiStore;
+  const store = yapiStore.useStore();
+  const loading = yapiStore.useLoading();
+  
+  // 使用剪贴板 Hook
+  const { copyToClipboard } = useClipboard();
+
+  /**
+   * 处理按钮点击事件
+   */
   const handleClick = async () => {
     try {
-      // 1. 从 URL 获取接口 ID
-      const apiId = window.location.pathname.split("/").pop();
-      if (!apiId) throw new Error("无法获取接口ID");
-
-      // 2. 调用 YApi 接口获取数据
-      const response = await fetch(`/api/interface/get?id=${apiId}`);
-      const data = await response.json();
-
-      const { queryType, paramsType, responseType } = await handleData(
-        data.data
-      );
-
-      const allTypes = [
-        '// 请求参数类型',
-        [queryType, paramsType].join("\n"),
-        '',
-        '// 响应数据类型',
-        responseType
-      ].join("\n\n");
-
-      handleCopy(allTypes);
+      // 如果已经有 TypeScript 结果，直接复制
+      if (store.typescriptResult) {
+        handleCopy();
+        return;
+      }
+      
+      // 否则先生成 TypeScript，再复制
+      await store.generateTypeScript();
+      handleCopy();
     } catch (error) {
+      // 错误处理在 store 中已完成
       console.error("JSON转TypeScript失败:", error);
-      alert(
-        `生成TypeScript失败: ${(error as Error).message || "请查看控制台了解详情"}`
-      );
     }
   };
 
-  const handleCopy = (content: string) => {
-    navigator.clipboard.writeText(content);
-
-    // 显示通知
-    showNotification("TypeScript类型已复制到剪贴板！");
-
-    // 发送系统通知
-    sendSystemNotification(
-      "YApi to TypeScript",
-      "TypeScript类型已复制到剪贴板"
-    );
+  /**
+   * 处理复制功能
+   */
+  const handleCopy = () => {
+    if (store.mergedTypeScript) {
+      copyToClipboard(store.mergedTypeScript, {
+        successMessage: "TypeScript类型已复制到剪贴板！",
+        notificationTitle: "YApi to TypeScript"
+      });
+    }
   };
 
   return (
@@ -71,8 +53,12 @@ const JsonToTsButton: React.FC = () => {
         className="yapi-helper-btn json-to-ts-btn"
         onClick={handleClick}
         data-yapi-helper="true"
+        disabled={loading.fetchApiData.loading || loading.generateTypeScript.loading}
       >
-        转换为TypeScript
+        {loading.fetchApiData.loading || loading.generateTypeScript.loading
+          ? "转换中..."
+          : "转换为TypeScript"
+        }
       </button>
     </>
   );

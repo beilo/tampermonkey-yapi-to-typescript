@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import YapiButton from "./components/YapiButton";
 import JsonToTsButton from "./components/JsonToTsButton";
 
