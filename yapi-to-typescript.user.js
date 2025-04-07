@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         YApi to TypeScript via Cursor
-// @namespace    https://github.com/beilo/tampermonkey-yapi-to-typescript
+// @namespace    https://github.com/你的用户名/yapi-to-typescript
 // @version      0.2.1
 // @description  将 YApi 接口转换为 TypeScript 代码（通过 Cursor Agent）
 // @author       YApi Helper
