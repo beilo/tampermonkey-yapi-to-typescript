@@ -1,7 +1,8 @@
 import { TypeScriptResult } from "../types/yapi";
+import jstt from 'json-schema-to-typescript';
 
 // 使用类型断言获取全局window上的jstt对象
-const jstt = (window as any).jstt;
+// const jstt = (window as any).jstt;
 
 /**
  * JSON转TypeScript的编译选项
