@@ -1,8 +1,18 @@
 import { TypeScriptResult } from "../types/yapi";
-import jstt from 'json-schema-to-typescript';
 
-// 使用类型断言获取全局window上的jstt对象
-// const jstt = (window as any).jstt;
+let jstt: any;
+try {
+  if (import.meta.env.PROD) {
+    jstt = await import("json-schema-to-typescript");
+  } else {
+    // @ts-ignore
+    await import("./bundle.js");
+    jstt = (window as any).jstt;
+  }
+} catch (error) {
+  console.error("Failed to load json-schema-to-typescript:", error);
+  throw error;
+}
 
 /**
  * JSON转TypeScript的编译选项
@@ -24,25 +34,25 @@ const compileOptions = {
  */
 function formatJson(objectJson: string) {
   const cloneObject = JSON.parse(objectJson);
-  
+
   // 顶层属性设置
   if (cloneObject.properties) {
     cloneObject.additionalProperties = false;
   }
-  
+
   // 递归设置子属性
   function processNestedProperties(obj: any) {
     for (const key in obj) {
       if (obj[key]?.properties) {
         obj[key].additionalProperties = false;
       }
-      
+
       if (typeof obj[key] === "object" && obj[key] !== null) {
         processNestedProperties(obj[key]);
       }
     }
   }
-  
+
   processNestedProperties(cloneObject);
   return cloneObject;
 }
@@ -77,7 +87,10 @@ function getTypeNameFromPath(path: string): string {
  * @param name 类型名称
  * @returns 生成的TypeScript类型定义
  */
-export async function convertJsonToTypeScript(json: string, name: string): Promise<string> {
+export async function convertJsonToTypeScript(
+  json: string,
+  name: string
+): Promise<string> {
   try {
     const formattedJson = formatJson(json);
     const result = await jstt.compile(formattedJson, name, compileOptions);
@@ -96,7 +109,7 @@ export async function convertJsonToTypeScript(json: string, name: string): Promi
 export async function handleData(data: any): Promise<TypeScriptResult> {
   try {
     const name = getTypeNameFromPath(data.query_path?.path || data.path);
-    
+
     // 处理请求参数
     const query = data.req_query || [];
     const reqBodyOther = data.req_body_other || "{}";
@@ -110,7 +123,7 @@ export async function handleData(data: any): Promise<TypeScriptResult> {
     const [queryType, paramsType, responseType] = await Promise.all([
       convertJsonToTypeScript(JSON.stringify(query), `${name}Query`),
       convertJsonToTypeScript(JSON.stringify(params), `${name}Params`),
-      convertJsonToTypeScript(JSON.stringify(response), `${name}Response`)
+      convertJsonToTypeScript(JSON.stringify(response), `${name}Response`),
     ]);
 
     return {
@@ -120,7 +133,9 @@ export async function handleData(data: any): Promise<TypeScriptResult> {
     };
   } catch (error) {
     console.error("📢 handleData error:", error);
-    throw new Error(`生成TypeScript类型失败: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `生成TypeScript类型失败: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
