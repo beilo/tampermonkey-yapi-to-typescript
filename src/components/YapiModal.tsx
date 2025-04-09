@@ -122,7 +122,7 @@ const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
         >
           Cursor 指令
         </div>
-        <div
+        {/* <div
           className={`yapi-helper-tab ${store.activeTab === 'typescript' ? 'active' : ''}`}
           onClick={() => {
             handleGenerateTs();
@@ -130,7 +130,7 @@ const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
           }}
         >
           TypeScript
-        </div>
+        </div> */}
         <div
           className={`yapi-helper-tab ${store.activeTab === 'preferences' ? 'active' : ''}`}
           onClick={() => store.setActiveTab('preferences')}
@@ -164,7 +164,7 @@ const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
         )}
         
         {/* TypeScript内容 */}
-        {store.activeTab === 'typescript' && (
+        {/* {store.activeTab === 'typescript' && (
           <div className="yapi-helper-instruction-content">
             <pre
               style={{
@@ -185,7 +185,7 @@ const YapiModal: React.FC<ModalProps> = ({ onClose, onCopy }) => {
                 : '// 正在生成TypeScript接口...'}
             </pre>
           </div>
-        )}
+        )} */}
 
         {/* 偏好设置内容 */}
         {store.activeTab === 'preferences' && (

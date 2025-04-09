@@ -1,5 +1,5 @@
-import { UserPreferences, Preferences } from './userPreferences';
-import useUserPreferencesStore from '../store/userPreferencesStore';
+import { UserPreferences, Preferences } from "./userPreferences";
+import useUserPreferencesStore from "../store/userPreferencesStore";
 
 export interface ApiData {
   title: string;
@@ -8,6 +8,7 @@ export interface ApiData {
     path: string;
   };
   req_body_other?: string;
+  req_query?: string;
   res_body?: string;
 }
 
@@ -19,7 +20,7 @@ export interface ApiData {
 export function generateAgentInstruction(data: { data: ApiData }): string {
   // 尝试从 store 获取用户偏好，如果无法获取则使用 UserPreferences
   let prefs: Preferences;
-  
+
   try {
     // 获取 store 实例
     const prefsStore = useUserPreferencesStore.useStore();
@@ -38,11 +39,20 @@ export function generateAgentInstruction(data: { data: ApiData }): string {
   const domain = window.location.href; // 获取当前域名
 
   // 解析请求和响应数据
+  let resQuery = "无请求体";
+  if (apiData.req_query) {
+    try {
+      resQuery = JSON.parse(apiData.req_query);
+      resQuery = JSON.stringify(resQuery);
+    } catch (error) {
+      resQuery = apiData.req_query;
+    }
+  }
   let reqBody = "无请求体";
   if (apiData.req_body_other) {
     try {
       const reqJson = JSON.parse(apiData.req_body_other);
-      reqBody = JSON.stringify(reqJson, null, 2);
+      reqBody = JSON.stringify(reqJson);
     } catch (e) {
       reqBody = apiData.req_body_other;
     }
@@ -52,7 +62,7 @@ export function generateAgentInstruction(data: { data: ApiData }): string {
   if (apiData.res_body) {
     try {
       const resJson = JSON.parse(apiData.res_body);
-      resBody = JSON.stringify(resJson, null, 2);
+      resBody = JSON.stringify(resJson);
     } catch (e) {
       resBody = apiData.res_body;
     }
@@ -60,12 +70,13 @@ export function generateAgentInstruction(data: { data: ApiData }): string {
 
   // 生成 Cursor Agent 指令
   return generateInstructionText(
-    title, 
-    path, 
-    method, 
-    domain, 
-    reqBody, 
-    resBody, 
+    title,
+    path,
+    method,
+    domain,
+    resQuery,
+    reqBody,
+    resBody,
     prefs
   );
 }
@@ -78,6 +89,7 @@ function generateInstructionText(
   path: string,
   method: string,
   domain: string,
+  resQuery: string,
   reqBody: string,
   resBody: string,
   prefs: Preferences
@@ -90,7 +102,12 @@ function generateInstructionText(
 - 请求方法: ${method}
 - 接口域名: ${domain}
 
-## 请求数据
+## 请求数据query
+\`\`\`json
+${resQuery}
+\`\`\`
+
+## 请求数据body
 \`\`\`json
 ${reqBody}
 \`\`\`
@@ -101,36 +118,46 @@ ${resBody}
 \`\`\`
 
 ## 代码生成严格要求
-1. 使用 ${prefs.typeStyle} 定义所有类型
-2. 仅使用 export 导出顶层接口/类型（请求参数和响应数据的主要类型）
-3. 所有嵌套/内部类型必须定义为内部类型，不要导出它们
-4. 使用 ${prefs.requestLib} 作为请求库
-5. ${prefs.enableComments ? "添加详细的注释" : "尽量减少注释"}
-6. ${prefs.useOptionalProps ? "对可选属性使用 ? 标记" : "不使用 ? 标记可选属性"}
-7. ${
-    prefs.includeExamples
-      ? "提供使用示例代码，并使用 try-catch 包裹示例代码以处理可能的异常，不要注释示例代码"
-      : "不需要提供使用示例"
-  }
+### A. 核心要求 (根据用户偏好)
+1.  **类型风格**: 使用 \`${prefs.typeStyle}\` 定义所有类型。
+2.  **注释**: ${prefs.enableComments ? "添加详细的、**中文的** JSDoc 注释（为所有生成的类型、函数、接口属性、常量添加，清晰地解释其用途、参数和返回值）" : "尽量减少注释"}。
+3.  **请求库**: 使用 \`${prefs.requestLib}\` 作为请求库来生成异步请求函数。函数应返回一个解析为响应数据接口类型的 \`Promise\`。
+4.  **可选属性**: ${prefs.useOptionalProps ? "对可选属性使用 \`?\` 标记" : "不使用 \`?\` 标记可选属性"}。
+5.  **使用示例**: ${prefs.includeExamples ? "必须在代码末尾提供一个可运行的、使用 \`try-catch\` 包裹的、无注释的函数调用示例，用于演示如何使用生成的请求函数。" : "不需要提供使用示例。"}
 ${
   prefs.useEnums
-    ? `8. 对于有固定值集合的字段（如状态码、类型标识等），不要使用enum，应该使用类型字面量+as const方案，例如：
-\`\`\`typescript
-// 类型字面量+as const方案
-const METHOD = {
-  ADD: 'add',
-  /**
-   * @deprecated 不再支持删除
-   */  
-  DELETE: 'delete', // 可以添加丰富的JSDoc注释
-  UPDATE: 'update',
-  QUERY: 'query'
-} as const
-type METHOD_TYPE = typeof METHOD[keyof typeof METHOD]
-\`\`\`
-这种方案支持添加JSDoc注释，代码可读性更好，并且值可以在运行时使用。`
+    ? `6.  **常量与枚举**: 对于有固定值集合的字段（如状态码、类型标识等），必须使用"字面量类型 + as const"方案，并使用 \`UPPER_SNAKE_CASE\` 命名常量。严格禁止使用 \`enum\`。示例如下：
+    \`\`\`typescript
+    // 正确示例: 字面量类型 + as const
+    const ORDER_STATUS = {
+      PENDING: 'pending',
+      PROCESSING: 'processing',
+      COMPLETED: 'completed',
+      CANCELLED: 'cancelled'
+    } as const;
+    type OrderStatus = typeof ORDER_STATUS[keyof typeof ORDER_STATUS];
+
+    // 错误示例: enum
+    // enum OrderStatus { PENDING = 'pending', ... } // 禁止使用
+    \`\`\``
     : ""
 }
+6. 仅使用 export 导出顶层接口/类型（请求参数和响应数据的主要类型）
+7. 所有嵌套/内部类型必须定义为内部类型，不要导出它们。
 
-请确保代码符合 TypeScript 最佳实践，保持类型安全和代码清晰度。`;
-} 
+### B. 通用规范 (始终遵循)
+*   **头部注释**: 必须在生成的代码最开始处添加包含接口基本信息（接口名称、请求路径、请求方法、接口域名）的 JSDoc 注释块。格式如下：
+    \`\`\`typescript
+    /**
+     * 接口名称: ${title}
+     * 请求路径: ${path}
+     * 请求方法: ${method}
+     * 接口域名: ${domain}
+     */
+    \`\`\`
+*   **导出规则**: 所有嵌套/内部类型必须定义为内部类型，不要导出它们·
+*   **命名规范**: 接口名称必须使用 \`PascalCase\`，函数名称必须使用 \`camelCase\`。如果使用 \`as const\` 定义常量，常量名称使用 \`UPPER_SNAKE_CASE\`。
+*   **类型安全**: 严格禁止使用 \`any\` 类型。
+*   **输出格式**: 最终生成的输出必须是纯粹的、格式化良好的 TypeScript 代码，不应包含任何 Markdown 标记（如 \`\`\`typescript ... \`\`\`）、介绍性文字或解释性说明。
+*   **最佳实践**: 确保生成的代码遵循 TypeScript 的最佳实践，注重类型安全、代码清晰度和可维护性。必须严格遵守A. 核心要求`;
+}
