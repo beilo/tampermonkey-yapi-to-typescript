@@ -1,6 +1,6 @@
 .yapi-helper-btn {
     position: fixed;
-    top: 20px;
+    top: 80px;
     right: 20px;
     z-index: 9999;
     padding: 10px 20px;
@@ -21,7 +21,7 @@
 
 .local-ts-btn {
     position: fixed;
-    top: 20px;
+    top: 80px;
     right: 200px;
     z-index: 9999;
     padding: 10px 20px;
@@ -42,7 +42,7 @@
 
 .json-to-ts-btn {
     position: fixed;
-    top: 20px;
+    top: 80px;
     right: 200px;
     z-index: 9999;
     padding: 10px 20px;
