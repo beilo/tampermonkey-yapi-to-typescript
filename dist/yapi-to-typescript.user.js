@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YApi to TypeScript via Cursor
 // @namespace    https://github.com/beilo/tampermonkey-yapi-to-typescript
-// @version      0.2.1
+// @version      0.2.2
 // @author       YApi Helper
 // @description  将 YApi 接口转换为 TypeScript 代码（通过 Cursor Agent）
 // @license      MIT
@@ -20,7 +20,7 @@
 // @grant        GM_setValue
 // ==/UserScript==
 
-(o=>{if(typeof GM_addStyle=="function"){GM_addStyle(o);return}const e=document.createElement("style");e.textContent=o,document.head.append(e)})(" .yapi-helper-btn{position:fixed;top:20px;right:20px;z-index:9999;padding:10px 20px;background-color:#4285f4;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;box-shadow:0 2px 5px #0003;transition:all .3s ease}.yapi-helper-btn:hover{background-color:#3367d6;box-shadow:0 3px 8px #0000004d}.local-ts-btn{position:fixed;top:20px;right:200px;z-index:9999;padding:10px 20px;background-color:#00a86b;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;box-shadow:0 2px 5px #0003;transition:all .3s ease}.local-ts-btn:hover{background-color:#008f5d;box-shadow:0 3px 8px #0000004d}.json-to-ts-btn{position:fixed;top:20px;right:200px;z-index:9999;padding:10px 20px;background-color:#f44336;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;box-shadow:0 2px 5px #0003;transition:all .3s ease}.json-to-ts-btn:hover{background-color:#d32f2f;box-shadow:0 3px 8px #0000004d}.yapi-helper-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#fff;padding:20px;border-radius:8px;box-shadow:0 4px 20px #00000026;max-width:800px;width:90%;max-height:80vh;overflow:auto;z-index:10000;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}.yapi-helper-notification{position:fixed;top:70px;right:20px;background-color:#4caf50;color:#fff;padding:10px 20px;border-radius:4px;z-index:10001;opacity:0;transition:opacity .3s ease;box-shadow:0 3px 10px #0003}.yapi-helper-notification.show{opacity:1}.yapi-helper-button-container{margin-top:15px;display:flex;justify-content:space-between;gap:10px}.yapi-helper-button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;transition:all .2s ease}.yapi-helper-button.primary{background-color:#4285f4;color:#fff}.yapi-helper-button.secondary{background-color:#f0f0f0}.yapi-helper-button:hover{filter:brightness(.95)}.yapi-helper-tabs{display:flex;margin-bottom:15px;border-bottom:1px solid #e0e0e0}.yapi-helper-tab{padding:8px 16px;cursor:pointer;border-bottom:2px solid transparent}.yapi-helper-tab.active{border-bottom:2px solid #4285f4;color:#4285f4}.yapi-helper-section{margin-bottom:15px}.yapi-helper-section-title{font-weight:700;margin-bottom:5px}.yapi-helper-checkbox-group{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px}.yapi-helper-checkbox-item{display:flex;align-items:center;gap:5px}.yapi-helper-instruction-content{max-height:400px;overflow-y:auto}.yapi-helper-types-container{display:flex;flex-direction:column;gap:20px;margin-bottom:20px}.yapi-helper-type-section{border:1px solid #e0e0e0;border-radius:4px;overflow:hidden}.yapi-helper-type-header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background-color:#f6f8fa;border-bottom:1px solid #e0e0e0}.yapi-helper-type-header h4{margin:0;font-size:16px;font-weight:500}.yapi-helper-button.small-btn{padding:4px 12px;font-size:13px}@media (min-width: 768px){.yapi-helper-types-container{max-height:70vh;overflow-y:auto}.yapi-helper-instruction-content pre{max-height:250px!important}} ");
+(o=>{if(typeof GM_addStyle=="function"){GM_addStyle(o);return}const e=document.createElement("style");e.textContent=o,document.head.append(e)})(" .yapi-helper-btn{position:fixed;top:80px;right:20px;z-index:9999;padding:10px 20px;background-color:#4285f4;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;box-shadow:0 2px 5px #0003;transition:all .3s ease}.yapi-helper-btn:hover{background-color:#3367d6;box-shadow:0 3px 8px #0000004d}.local-ts-btn{position:fixed;top:80px;right:200px;z-index:9999;padding:10px 20px;background-color:#00a86b;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;box-shadow:0 2px 5px #0003;transition:all .3s ease}.local-ts-btn:hover{background-color:#008f5d;box-shadow:0 3px 8px #0000004d}.json-to-ts-btn{position:fixed;top:80px;right:200px;z-index:9999;padding:10px 20px;background-color:#f44336;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;box-shadow:0 2px 5px #0003;transition:all .3s ease}.json-to-ts-btn:hover{background-color:#d32f2f;box-shadow:0 3px 8px #0000004d}.yapi-helper-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background-color:#fff;padding:20px;border-radius:8px;box-shadow:0 4px 20px #00000026;max-width:800px;width:90%;max-height:80vh;overflow:auto;z-index:10000;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}.yapi-helper-notification{position:fixed;top:70px;right:20px;background-color:#4caf50;color:#fff;padding:10px 20px;border-radius:4px;z-index:10001;opacity:0;transition:opacity .3s ease;box-shadow:0 3px 10px #0003}.yapi-helper-notification.show{opacity:1}.yapi-helper-button-container{margin-top:15px;display:flex;justify-content:space-between;gap:10px}.yapi-helper-button{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;transition:all .2s ease}.yapi-helper-button.primary{background-color:#4285f4;color:#fff}.yapi-helper-button.secondary{background-color:#f0f0f0}.yapi-helper-button:hover{filter:brightness(.95)}.yapi-helper-tabs{display:flex;margin-bottom:15px;border-bottom:1px solid #e0e0e0}.yapi-helper-tab{padding:8px 16px;cursor:pointer;border-bottom:2px solid transparent}.yapi-helper-tab.active{border-bottom:2px solid #4285f4;color:#4285f4}.yapi-helper-section{margin-bottom:15px}.yapi-helper-section-title{font-weight:700;margin-bottom:5px}.yapi-helper-checkbox-group{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px}.yapi-helper-checkbox-item{display:flex;align-items:center;gap:5px}.yapi-helper-instruction-content{max-height:400px;overflow-y:auto}.yapi-helper-types-container{display:flex;flex-direction:column;gap:20px;margin-bottom:20px}.yapi-helper-type-section{border:1px solid #e0e0e0;border-radius:4px;overflow:hidden}.yapi-helper-type-header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background-color:#f6f8fa;border-bottom:1px solid #e0e0e0}.yapi-helper-type-header h4{margin:0;font-size:16px;font-weight:500}.yapi-helper-button.small-btn{padding:4px 12px;font-size:13px}@media (min-width: 768px){.yapi-helper-types-container{max-height:70vh;overflow-y:auto}.yapi-helper-instruction-content pre{max-height:250px!important}} ");
 
 System.addImportMap({ imports: {"react":"user:react","react-dom":"user:react-dom","json-schema-to-typescript":"user:json-schema-to-typescript"} });
 System.set("user:react", (()=>{const _=React;('default' in _)||(_.default=_);return _})());
@@ -7050,11 +7050,20 @@ loc2:${options.loc}`;
         const path = apiData.query_path.path;
         const title = apiData.title;
         const domain = window.location.href;
+        let resQuery = "无请求体";
+        if (apiData.req_query) {
+          try {
+            resQuery = JSON.parse(apiData.req_query);
+            resQuery = JSON.stringify(resQuery);
+          } catch (error) {
+            resQuery = apiData.req_query;
+          }
+        }
         let reqBody = "无请求体";
         if (apiData.req_body_other) {
           try {
             const reqJson = JSON.parse(apiData.req_body_other);
-            reqBody = JSON.stringify(reqJson, null, 2);
+            reqBody = JSON.stringify(reqJson);
           } catch (e2) {
             reqBody = apiData.req_body_other;
           }
@@ -7063,7 +7072,7 @@ loc2:${options.loc}`;
         if (apiData.res_body) {
           try {
             const resJson = JSON.parse(apiData.res_body);
-            resBody = JSON.stringify(resJson, null, 2);
+            resBody = JSON.stringify(resJson);
           } catch (e2) {
             resBody = apiData.res_body;
           }
@@ -7073,12 +7082,13 @@ loc2:${options.loc}`;
           path,
           method,
           domain,
+          resQuery,
           reqBody,
           resBody,
           prefs
         );
       }
-      function generateInstructionText(title, path, method, domain, reqBody, resBody, prefs) {
+      function generateInstructionText(title, path, method, domain, resQuery, reqBody, resBody, prefs) {
         return `我需要你帮我将以下 YApi 接口转换为 TypeScript 代码：
 
 ## 接口基本信息
@@ -7087,7 +7097,12 @@ loc2:${options.loc}`;
 - 请求方法: ${method}
 - 接口域名: ${domain}
 
-## 请求数据
+## 请求数据query
+\`\`\`json
+${resQuery}
+\`\`\`
+
+## 请求数据body
 \`\`\`json
 ${reqBody}
 \`\`\`
@@ -7098,30 +7113,44 @@ ${resBody}
 \`\`\`
 
 ## 代码生成严格要求
-1. 使用 ${prefs.typeStyle} 定义所有类型
-2. 仅使用 export 导出顶层接口/类型（请求参数和响应数据的主要类型）
-3. 所有嵌套/内部类型必须定义为内部类型，不要导出它们
-4. 使用 ${prefs.requestLib} 作为请求库
-5. ${prefs.enableComments ? "添加详细的注释" : "尽量减少注释"}
-6. ${prefs.useOptionalProps ? "对可选属性使用 ? 标记" : "不使用 ? 标记可选属性"}
-7. ${prefs.includeExamples ? "提供使用示例代码，并使用 try-catch 包裹示例代码以处理可能的异常，不要注释示例代码" : "不需要提供使用示例"}
-${prefs.useEnums ? `8. 对于有固定值集合的字段（如状态码、类型标识等），不要使用enum，应该使用类型字面量+as const方案，例如：
-\`\`\`typescript
-// 类型字面量+as const方案
-const METHOD = {
-  ADD: 'add',
-  /**
-   * @deprecated 不再支持删除
-   */  
-  DELETE: 'delete', // 可以添加丰富的JSDoc注释
-  UPDATE: 'update',
-  QUERY: 'query'
-} as const
-type METHOD_TYPE = typeof METHOD[keyof typeof METHOD]
-\`\`\`
-这种方案支持添加JSDoc注释，代码可读性更好，并且值可以在运行时使用。` : ""}
+### A. 核心要求 (根据用户偏好)
+1.  **类型风格**: 使用 \`${prefs.typeStyle}\` 定义所有类型。
+2.  **注释**: ${prefs.enableComments ? "添加详细的、**中文的** JSDoc 注释（为所有生成的类型、函数、接口属性、常量添加，清晰地解释其用途、参数和返回值）" : "尽量减少注释"}。
+3.  **请求库**: 使用 \`${prefs.requestLib}\` 作为请求库来生成异步请求函数。函数应返回一个解析为响应数据接口类型的 \`Promise\`。
+4.  **可选属性**: ${prefs.useOptionalProps ? "对可选属性使用 `?` 标记" : "不使用 `?` 标记可选属性"}。
+5.  **使用示例**: ${prefs.includeExamples ? "必须在代码末尾提供一个可运行的、使用 `try-catch` 包裹的、无注释的函数调用示例，用于演示如何使用生成的请求函数。" : "不需要提供使用示例。"}
+${prefs.useEnums ? `6.  **常量与枚举**: 对于有固定值集合的字段（如状态码、类型标识等），必须使用"字面量类型 + as const"方案，并使用 \`UPPER_SNAKE_CASE\` 命名常量。严格禁止使用 \`enum\`。示例如下：
+    \`\`\`typescript
+    // 正确示例: 字面量类型 + as const
+    const ORDER_STATUS = {
+      PENDING: 'pending',
+      PROCESSING: 'processing',
+      COMPLETED: 'completed',
+      CANCELLED: 'cancelled'
+    } as const;
+    type OrderStatus = typeof ORDER_STATUS[keyof typeof ORDER_STATUS];
 
-请确保代码符合 TypeScript 最佳实践，保持类型安全和代码清晰度。`;
+    // 错误示例: enum
+    // enum OrderStatus { PENDING = 'pending', ... } // 禁止使用
+    \`\`\`` : ""}
+6. 仅使用 export 导出顶层接口/类型（请求参数和响应数据的主要类型）
+7. 所有嵌套/内部类型必须定义为内部类型，不要导出它们。
+
+### B. 通用规范 (始终遵循)
+*   **头部注释**: 必须在生成的代码最开始处添加包含接口基本信息（接口名称、请求路径、请求方法、接口域名）的 JSDoc 注释块。格式如下：
+    \`\`\`typescript
+    /**
+     * 接口名称: ${title}
+     * 请求路径: ${path}
+     * 请求方法: ${method}
+     * 接口域名: ${domain}
+     */
+    \`\`\`
+*   **导出规则**: 所有嵌套/内部类型必须定义为内部类型，不要导出它们·
+*   **命名规范**: 接口名称必须使用 \`PascalCase\`，函数名称必须使用 \`camelCase\`。如果使用 \`as const\` 定义常量，常量名称使用 \`UPPER_SNAKE_CASE\`。
+*   **类型安全**: 严格禁止使用 \`any\` 类型。
+*   **输出格式**: 最终生成的输出必须是纯粹的、格式化良好的 TypeScript 代码，不应包含任何 Markdown 标记（如 \`\`\`typescript ... \`\`\`）、介绍性文字或解释性说明。
+*   **最佳实践**: 确保生成的代码遵循 TypeScript 的最佳实践，注重类型安全、代码清晰度和可维护性。必须严格遵守A. 核心要求`;
       }
       const useYapiStore = A("YapiStore", {
         // 状态定义
@@ -7412,17 +7441,6 @@ type METHOD_TYPE = typeof METHOD[keyof typeof METHOD]
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "div",
               {
-                className: `yapi-helper-tab ${store.activeTab === "typescript" ? "active" : ""}`,
-                onClick: () => {
-                  handleGenerateTs();
-                  store.setActiveTab("typescript");
-                },
-                children: "TypeScript"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "div",
-              {
                 className: `yapi-helper-tab ${store.activeTab === "preferences" ? "active" : ""}`,
                 onClick: () => store.setActiveTab("preferences"),
                 children: "偏好设置"
@@ -7445,23 +7463,6 @@ type METHOD_TYPE = typeof METHOD[keyof typeof METHOD]
                   overflowY: "auto"
                 },
                 children: store.instruction
-              }
-            ) }),
-            store.activeTab === "typescript" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "yapi-helper-instruction-content", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "pre",
-              {
-                style: {
-                  whiteSpace: "pre-wrap",
-                  background: "#f6f8fa",
-                  padding: "16px",
-                  borderRadius: "4px",
-                  overflowX: "auto",
-                  fontSize: "14px",
-                  fontFamily: "SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace",
-                  maxHeight: "400px",
-                  overflowY: "auto"
-                },
-                children: store.typescriptResult ? store.mergedTypeScript : "// 正在生成TypeScript接口..."
               }
             ) }),
             store.activeTab === "preferences" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -7565,15 +7566,22 @@ type METHOD_TYPE = typeof METHOD[keyof typeof METHOD]
         const handleClick = async () => {
           try {
             await store.generateInstruction();
+            handleCopy(false);
           } catch (error) {
             console.error("YApi Helper: 生成指令失败:", error);
           }
         };
-        const handleCopy = () => {
+        const handleCopy = (isClose) => {
+          let tempIsClose = isClose;
+          if (isClose === void 0 || isClose === null) {
+            tempIsClose = true;
+          }
           copyToClipboard(store.instruction, {
             successMessage: "指令已复制到剪贴板！请切换到 Cursor 编辑器并粘贴。",
             notificationTitle: "YApi to TypeScript",
-            onSuccess: () => store.setModalVisibility(false)
+            onSuccess: () => {
+              tempIsClose && store.setModalVisibility(false);
+            }
           });
         };
         return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
@@ -7584,7 +7592,7 @@ type METHOD_TYPE = typeof METHOD[keyof typeof METHOD]
               onClick: handleClick,
               "data-yapi-helper": "true",
               disabled: loading.fetchApiData.loading || loading.generateInstruction.loading,
-              children: loading.fetchApiData.loading || loading.generateInstruction.loading ? "加载中..." : "生成 TypeScript 代码"
+              children: loading.fetchApiData.loading || loading.generateInstruction.loading ? "加载中..." : "生成 ai提示词 代码"
             }
           ),
           store.isModalVisible && store.apiData && /* @__PURE__ */ jsxRuntimeExports.jsx(

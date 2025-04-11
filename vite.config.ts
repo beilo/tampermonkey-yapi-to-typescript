@@ -11,7 +11,7 @@ export default defineConfig({
       userscript: {
         name: 'YApi to TypeScript via Cursor',
         namespace: 'https://github.com/beilo/tampermonkey-yapi-to-typescript',
-        version: '0.2.1',
+        version: '0.2.2',
         description: '将 YApi 接口转换为 TypeScript 代码（通过 Cursor Agent）',
         author: 'YApi Helper',
         match: ['*://interface.codemao.cn/*'],
